@@ -10,10 +10,9 @@ Moreover we use the TensorFlows's Slim model which offers an easy to use fronten
 Both models can be found in the TensorFlow Github-repository for TensorFlow models: https://github.com/tensorflow/models/
 
 ##TensorFlow-Environment
-Pre SCS5 node (z.b. tauruslogin3)
+SCS5 node (z.b. tauruslogin6)
 ```
-module load modenv/both
-module load tensorflow/1.3.0-Python-3.5.2
+module load TensorFlow/1.10.0-fosscuda-2018b-Python-3.6.6
 ```
 
 ## Dataset
@@ -21,8 +20,13 @@ We use the dataset from
 It's a large dataset of about 140GiB.
 
 ## Installation
-    git clone https://github.com/tensorflow/models/
-    cd models/research/slim
+```    
+git clone https://github.com/tensorflow/models/
+cd models 
+git checkout r1.10.0
+git checkout b07b494
+cd research/slim
+```
 
 ### Download the dataset	
 The dataset is available under: `//lustre/ssd/p_tensorflow/imagenet-dataset/tfrecords/`
