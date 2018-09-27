@@ -16,7 +16,7 @@ module load TensorFlow/1.10.0-fosscuda-2018b-Python-3.6.6
 ```
 
 ## Dataset
-We use the dataset from
+We use the Image-Net dataset from (http://image-net.org) 
 It's a large dataset of about 140GiB.
 
 ## Installation
@@ -24,20 +24,19 @@ It's a large dataset of about 140GiB.
 git clone https://github.com/tensorflow/models/
 cd models 
 git checkout r1.10.0
-git checkout b07b494
+git checkout b07b494 # last release commit removes only research folder
 cd research/slim
 ```
 
 ### Download the dataset	
-The dataset is available under: `//lustre/ssd/p_tensorflow/imagenet-dataset/tfrecords/`
+The dataset is available under: `/lustre/ssd/p_tensorflow/imagenet-dataset/tfrecords/`
 
 If you wish to download the dataset by yourself you have to create an account on [Image-Net](http://image-net.org/).
 Since the data will be preprocessed using TensorFlow you have make sure TensorFlow is available in your Python environment. 
 
 
 ```
-module load modenv/both
-modu load tensorflow/1.3.0-Python-3.5.2 bazel/0.5.2 java/jdk1.8.0_66
+module load TensorFlow/1.10.0-fosscuda-2018b-Python-3.6.6
 
 cd models/research/inception
 # location of where to place the ImageNet data
@@ -58,18 +57,19 @@ bazel-bin/inception/download_and_preprocess_imagenet "$
 mkdir ${DATA_DIR}/tfrecords
 mv ${DATA_DIR}/train-* ${DATA_DIR}/validation-00* ${DATA_DIR}/tfrecords
 ```
-Since the dataset is large and the download server is rather slow (50kb/s), which leads to problem on Taurus-Cluster with Slurm job sheduling and maximal runtime of jobs we recommand to modify the script.
-As wget has no native support for downloading a single file in parallel we used [Axel](https://github.com/axel-download-accelerator/axel). It can be found in `/projects/p_tensorflow/sw/axel/bin/axel`
-.
+Since the dataset is large and the download server is rather slow (50kb/s), which leads to problem on Taurus-Cluster with Slurm job scheduling and maximal runtime of jobs I recommend to modify the script.
+As wget has no native support for downloading a single file in parallel I used [Axel](https://github.com/axel-download-accelerator/axel). It can be found in `/projects/p_tensorflow/sw/axel/bin/axel`.
+
 In `inception/data/download_imagenet.sh` replace every `wget` call  with 
-```axel -n {VERY_LARGE_NUMBER_OF_THREADS e.g. } {URL}```
+`axel -n {VERY_LARGE_NUMBER_OF_THREADS e.g. } {URL}`
 
 It is recommand to request about 16 cpu cores on slurm to run it as `tar` will also speed up.
 
 After this the  dataset in TFRecord-format which is used by Slim and Inception can be found unter `DATA_DIR/tfrecords`.
 	
 ## Usage
-Es muss mindestens eine GPU verfügbar sein.
+There has to be at least 1 gpu be available.
+
 ### Training from scratch
 ```
 DATASET_DIR=/lustre/ssd/p_tensorflow/imagenet-dataset/tfrecords
@@ -81,7 +81,7 @@ python train_image_classifier.py \
 --dataset_name='imagenet' \
 --dataset_split_name=train \
 --model_name=inception_v3 \
---max_number_of_steps=200
+--max_number_of_steps=2000
 ```
 
 Training the net to an appropriate state would take weeks of processing, so we limit the number of learning iteration with the parameter `--max_number_of_steps`.
