@@ -17,7 +17,7 @@ This aims to build Scorep with Python support to use with TensorFlow
 
 ```
 svn co https://silc.zih.tu-dresden.de/svn/silc-root/branches/TRY_TUD_io_recording_for_trunk_reintegration 
-svn up -r 13779
+svn up -r 13824
 ```
 
 ```
@@ -148,7 +148,10 @@ setenv("EBDEVELOTF2", pathJoin(root, "easybuild/OTF2-2.1.1-foss-2018b-easybuild-
 ### Build Scorep
 ```
 module use /projects/p_tensorflow/modenv-scs5/
-module load OTF2/Python3.6
+module load  PAPI/5.6.0-foss-2018b fosscuda/2018b libunwind/1.2.1-foss-2018b OPARI2/2.0.3-foss-2018b CubeLib/4.4-foss-2018b CubeW/4.4-foss-2018b Python/3.6.6-fosscuda-2018b
+module load OTF2/Python3.6 scorep-dev/06
+
+./bootstrap -j 24
 
 mkdir build
 cd build
@@ -312,6 +315,8 @@ LD_PRELOAD=<your output str> python -m scorep <scripy.py>
 ```
 
  If your application used MPI use `LD_PRELOAD=<your output str>  python -m scorep --mpi <script.py>`.
+
+If your work is done exit `bash .scorep_preload/unknown_<XXX>.clean` to clean up scorep's preload files.
  
 ### Known problems
 For some TensorFlow aplications  my application crashed throwing the error 
