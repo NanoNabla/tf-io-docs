@@ -117,6 +117,8 @@ line_num=$(grep -m 1 -n "$2" $1 | sed "s/^\([0-9]\\+\):.*/\\1/;");
    fi;
 }
  
+ 
+# 'lustre' or 'highiops' for lustre on ssd
 iostats_file="$(srun find /proc/fs/lustre/llite -type d -iname "highiops-*")/stats";
 filter=""
 filter+="read bytes:uint@${iostats_file}+c=6;r=$(grep_line_num "${iostats_file}" "read_bytes");s= ;d,";
@@ -132,10 +134,18 @@ export SCOREP_METRIC_FILEPARSER_PLUGIN_PERIOD=10000;
 export SCOREP_METRIC_FILEPARSER_PLUGIN="${filter}";
  
 
-srun lo2s -- python ../train_image_classifier.py \
+srun lo2s -- python train_image_classifier.py \
+--train_dir [....]
 ```
 Make sure both `srun` commands will be executed on the same node.
 
 ### Score-P
 You have to build your own setup. For detailed information see [BuildScorepOnSCS5.md](BuildScorepOnSCS5.md)
 
+### NvProf
+Cuda including nvprof will be implicitly loaded by TensorFlow
+```
+nvprof --analysis-metrics -o my_profile.nvpp \
+python train_image_classifier.py \
+--train_dir [...]
+```
