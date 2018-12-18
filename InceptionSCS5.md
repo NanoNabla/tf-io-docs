@@ -76,7 +76,7 @@ DATASET_DIR=/lustre/ssd/p_tensorflow/imagenet-dataset/tfrecords
 TRAIN_DIR=/tmp/s8916149/inception_v3
 
 python train_image_classifier.py \
---train_dir=${TRAIN_DIR}\
+--train_dir=${TRAIN_DIR} \
 --dataset_dir=${DATASET_DIR} \
 --dataset_name='imagenet' \
 --dataset_split_name=train \
