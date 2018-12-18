@@ -88,9 +88,54 @@ Training the net to an appropriate state would take weeks of processing, so we l
 
 ### Evaluating an existing graph 
  to be done
- 
- 
- ### Fine-Tune a Pre-Trained Model on a New Task
+  
+
+### Fine-Tune a Pre-Trained Model on a New Task
  to be done
  
- ## Profiling / Tracing with Scorep
+
+## Profiling / Tracing with Scorep
+### Lo2s
+[https://github.com/tud-zih-energy/lo2s](https://github.com/tud-zih-energy/lo2s)
+
+```
+module load lo2s/1.1.1-GCCcore-6.4.0
+srun lo2s -- python ../train_image_classifier.py \
+--train_dir [....]
+```
+
+### Lo2s Lustre-Counter
+```
+module load scorep_plugin_fileparser
+module load lo2s
+module load TensorFlow/1.10.0-fosscuda-2018b-Python-3.6.6
+ 
+grep_line_num() {
+line_num=$(grep -m 1 -n "$2" $1 | sed "s/^\([0-9]\\+\):.*/\\1/;");
+   if [ -n ${line_num} ]; then
+       echo $((${line_num} - 1));
+   fi;
+}
+ 
+iostats_file="$(srun find /proc/fs/lustre/llite -type d -iname "highiops-*")/stats";
+filter=""
+filter+="read bytes:uint@${iostats_file}+c=6;r=$(grep_line_num "${iostats_file}" "read_bytes");s= ;d,";
+filter+="write bytes:uint@${iostats_file}+c=6;r=$(grep_line_num "${iostats_file}" "write_bytes");s= ;d,";
+filter+="open:uint@${iostats_file}+c=1;r=$(grep_line_num "${iostats_file}" "open");s= ;d,";
+filter+="close:uint@${iostats_file}+c=1;r=$(grep_line_num "${iostats_file}" "close");s= ;d,";
+filter+="page_fault:uint@${iostats_file}+c=1;r=$(grep_line_num "${iostats_file}" "page_fault");s= ;d";
+
+ 
+export SCOREP_ENABLE_TRACING=true;
+export SCOREP_ENABLE_PROFILING=false;
+export SCOREP_METRIC_FILEPARSER_PLUGIN_PERIOD=10000;
+export SCOREP_METRIC_FILEPARSER_PLUGIN="${filter}";
+ 
+
+srun lo2s -- python ../train_image_classifier.py \
+```
+Make sure both `srun` commands will be executed on the same node.
+
+### Score-P
+You have to build your own setup. For detailed information see [BuildScorepOnSCS5.md](BuildScorepOnSCS5.md)
+
