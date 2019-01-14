@@ -86,13 +86,8 @@ python train_image_classifier.py \
 
 Training the net to an appropriate state would take weeks of processing, so we limit the number of learning iteration with the parameter `--max_number_of_steps`.
 
-### Evaluating an existing graph 
- to be done
-  
-
-### Fine-Tune a Pre-Trained Model on a New Task
- to be done
- 
+### Use more than 1 GPU
+`--num_clones=4` makes `train_image_classifier.py` to use 4 gpu.
 
 ## Profiling / Tracing with Scorep
 ### Lo2s
