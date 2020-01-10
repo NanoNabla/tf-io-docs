@@ -75,7 +75,7 @@ Die Hostliste muss man sich aus der Umgebungsvariable `SLURM_JOB_NODELIST` zusam
 
 	python -c 'import tensorflow as tf; print(tf.__version__)' # Test ob TensorFlow in der Umgebung steckt
 
-	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.4.2-gcccuda-2019a \
+	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.3.7-gcccuda-2018b \
 	HOROVOD_WITH_MPI=1 \
 	HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITHOUT_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 \
     HOROVOD_GPU_ALLREDUCE=MPI HOROVOD_GPU_ALLGATHER=MPI HOROVOD_GPU_BROADCAST=MPI \
