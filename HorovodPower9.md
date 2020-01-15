@@ -39,7 +39,7 @@ Da NCCL scheinbar nur knotenlokal funktioniert, wird trotzdem MPI für Kommunika
 	python -c 'import tensorflow as tf; print(tf.__version__)' # Test ob TensorFlow in der Umgebung steckt
 
 	 
-	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.4.2-gcccuda-2019a HOROVOD_GPU_ALLREDUCE=NCCL \
+	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.3.7-fosscuda-2018b HOROVOD_GPU_ALLREDUCE=NCCL \
 	HOROVOD_WITH_MPI=1 \
 	HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITHOUT_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 \
 	python3 -m pip install --no-cache-dir horovod
@@ -58,7 +58,8 @@ Die Hostliste muss man sich aus der Umgebungsvariable `SLURM_JOB_NODELIST` zusam
 	
 	python -c "import tensorflow as tf; import horovod.tensorflow as hvd" # Test ob Horovod in der Umgebung steckt
 	
-	horovodrun -np 16 -H server1:4,server2:4,server3:4,server4:4 python train.py # 4 Knoten mit je 4 GPUs
+	#horovodrun -np 16 -H server1:4,server2:4,server3:4,server4:4 python train.py # 4 Knoten mit je 4 GPUs
+	srun python train.py
 
 	
 	
@@ -77,7 +78,7 @@ Die Hostliste muss man sich aus der Umgebungsvariable `SLURM_JOB_NODELIST` zusam
 
 	python -c 'import tensorflow as tf; print(tf.__version__)' # Test ob TensorFlow in der Umgebung steckt
 
-	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.3.7-gcccuda-2018b \
+	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.3.7-fosscuda-2018b \
 	HOROVOD_WITH_MPI=1 \
 	HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITHOUT_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 \
     HOROVOD_GPU_ALLREDUCE=MPI HOROVOD_GPU_ALLGATHER=MPI HOROVOD_GPU_BROADCAST=MPI \
@@ -97,11 +98,12 @@ Der `horovodrun`-Wrapper benötigt eine Liste der Hosts. Um dies zu Umgehen soll
 	
 	source horovod_mpi/bin/activate
 
-	mpirun -np 16 \
-	-bind-to none -map-by slot \
-	-x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH -x PATH \
-	-mca pml ob1 -mca btl ^openib \
-	python my_application.py
+	#mpirun -np 16 \
+	#-bind-to none -map-by slot \
+	#-x NCCL_DEBUG=INFO -x LD_LIBRARY_PATH -x PATH \
+	#-mca pml ob1 -mca btl ^openib \
+	#python my_application.py
+	srun python my_application.py
 	
 	
 >Open MPI with RDMA
@@ -121,8 +123,32 @@ Der `horovodrun`-Wrapper benötigt eine Liste der Hosts. Um dies zu Umgehen soll
 
 
 ## Horovod with Score-P
-Score-P 
+Da die im Modul `TensorFlow/1.14.0-PythonAnaconda-3.6` hinterlegte TensorFlow-Version CUDA 10.1 verwendet, muss auch Score-P gegen die selbe CUDA-Version gelinkt werden. Hierzu ist das Paket `fosscuda/2019a` statt `fosscuda/2018b` erforderlich.
 
+Eine bereitstehende Score-P-Installation (<= 6.0) mit vorausgesetzt.
+
+### Installation
+
+	module load modenv/ml
+	module load Score-P/6.0-fosscuda-2019a # nicht im Modenv enthalten
+	module load TensorFlow/1.14.0-PythonAnaconda-3.6
+	module load OpenMPI/3.1.3-gcccuda-2019a # Sollte gemäß Horovod-Manual nicht verwendet werden, steht aber als einziges zur Verfügung
+	module load NCCL/2.4.2-gcccuda-2019a	
+	
+	./virtualenv horovod_mpi_nccl_scorep_cuda10.1
+	source horovod_mpi_nccl_scorep_cuda10.1/bin/activate
+
+	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.4.2-gcccuda-2019a HOROVOD_GPU_ALLREDUCE=NCCL \
+	HOROVOD_WITH_MPI=1 \
+	HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITHOUT_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 \
+	python3 -m pip install --no-cache-dir horovod
+	
+	python -c "import tensorflow as tf; import horovod.tensorflow as hvd" # Test ob Horovod in der Umgebung steckt
+
+	### Install Score-P-Bindings for Python
+	git clone --branch=v3.0 https://github.com/score-p/scorep_binding_python.git
+	cd scorep_binding_python
+	python3 -m pip install .
 
 ## Weitere Infos
 ### NCCL
