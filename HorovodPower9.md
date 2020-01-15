@@ -22,12 +22,14 @@ Auf der Power9-Partition muss das Virtualenv noch installiert werden.
 ### Installation
 Unbedingt darauf achten, erst die Module zu Laden und dann erst ins Virtualenvironment zu wechseln.
 
+Da NCCL scheinbar nur knotenlokal funktioniert, wird trotzdem MPI für Kommunikation über Knotengrenzen hinweg benötigt. Dies sollte aber noch einmal geklärt werden. Um MPI nicht zu verwenden muss lediglich 
+`HOROVOD_WITH_MPI=1 ` gegen `HOROVOD_WITHOUT_MPI=1 ` getauscht werden
 
 
 	module load modenv/ml
 	module load TensorFlow/1.14.0-PythonAnaconda-3.6
-	module load NCCL/2.4.2-gcccuda-2019a
-	module load CMake/3.13.3-GCCcore-8.2.0
+	module load NCCL/2.3.7-fosscuda-2018b
+	module load CMake/3.12.1-GCCcore-7.3.0
 
 	# cd to your workspace
 
@@ -38,7 +40,7 @@ Unbedingt darauf achten, erst die Module zu Laden und dann erst ins Virtualenvir
 
 	 
 	HOROVOD_NCCL_HOME=/sw/installed/NCCL/2.4.2-gcccuda-2019a HOROVOD_GPU_ALLREDUCE=NCCL \
-	HOROVOD_WITHOUT_MPI=1 \
+	HOROVOD_WITH_MPI=1 \
 	HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITHOUT_PYTORCH=1 HOROVOD_WITHOUT_MXNET=1 \
 	python3 -m pip install --no-cache-dir horovod
 	
@@ -48,7 +50,7 @@ Unbedingt darauf achten, erst die Module zu Laden und dann erst ins Virtualenvir
 Die Hostliste muss man sich aus der Umgebungsvariable `SLURM_JOB_NODELIST` zusammenbauen.
 
 	module load modenv/ml
-	module load NCCL/2.4.2-gcccuda-2019a
+	module load NCCL/2.3.7-fosscuda-2018b
 	module load TensorFlow/1.14.0-PythonAnaconda-3.6
 
 	# cd to your workspace
@@ -117,6 +119,9 @@ Der `horovodrun`-Wrapper benötigt eine Liste der Hosts. Um dies zu Umgehen soll
 >
 >Other MPI RDMA implementations may or may not benefit from disabling multithreading, so please consult vendor documentation.	
 
+
+## Horovod with Score-P
+Score-P 
 
 
 ## Weitere Infos
